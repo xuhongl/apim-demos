@@ -1,0 +1,118 @@
+{
+   "$schema":"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+   "contentVersion":"1.0.0.0",
+   "parameters":{
+      "subscriptions_60073b8d4acd5f005f070001_displayName":{
+         "type":"SecureString"
+      },
+      "subscriptions_60073b8d4acd5f005f070002_displayName":{
+         "type":"SecureString"
+      },
+      "users_1_lastName":{
+         "type":"SecureString"
+      },
+      "service_tdmetapodtest_name":{
+         "defaultValue":"tdmetapodtest",
+         "type":"String"
+      }
+   },
+   "variables":{
+      
+   },
+   "resources":[
+      {
+         "type":"Microsoft.ApiManagement/service",
+         "apiVersion":"2020-06-01-preview",
+         "name":"[parameters('service_tdmetapodtest_name')]",
+         "location":"Central US",
+         "sku":{
+            "name":"Standard",
+            "capacity":2
+         },
+         "properties":{
+            "publisherEmail":"xuhliu@microsoft.com",
+            "publisherName":"xuhliu",
+            "notificationSenderEmail":"apimgmt-noreply@mail.windowsazure.com",
+            "hostnameConfigurations":[
+               {
+                  "type":"Proxy",
+                  "hostName":"[concat(parameters('service_tdmetapodtest_name'), '.azure-api.net')]",
+                  "negotiateClientCertificate":false,
+                  "defaultSslBinding":true
+               }
+            ],
+            "customProperties":{
+               "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10":"False",
+               "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11":"False",
+               "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Ssl30":"False",
+               "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Ciphers.TripleDes168":"False",
+               "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls10":"False",
+               "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls11":"False",
+               "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Ssl30":"False",
+               "Microsoft.WindowsAzure.ApiManagement.Gateway.Protocols.Server.Http2":"False"
+            },
+            "virtualNetworkType":"None",
+            "disableGateway":false,
+            "apiVersionConstraint":{
+               
+            }
+         }
+      },
+      {
+         "type":"Microsoft.ApiManagement/service/apis",
+         "apiVersion":"2020-06-01-preview",
+         "name":"[concat(parameters('service_tdmetapodtest_name'), '/echo-api')]",
+         "dependsOn":[
+            "[resourceId('Microsoft.ApiManagement/service', parameters('service_tdmetapodtest_name'))]"
+         ],
+         "properties":{
+            "displayName":"Echo API",
+            "apiRevision":"3",
+            "subscriptionRequired":true,
+            "serviceUrl":"http://echoapi.cloudapp.net/api",
+            "path":"echo",
+            "protocols":[
+               "https"
+            ],
+            "apiRevisionDescription":"test as well"
+         }
+      },
+      {
+         "type":"Microsoft.ApiManagement/service/apis",
+         "apiVersion":"2020-06-01-preview",
+         "name":"[concat(parameters('service_tdmetapodtest_name'), '/echo-api;rev=1')]",
+         "dependsOn":[
+            "[resourceId('Microsoft.ApiManagement/service', parameters('service_tdmetapodtest_name'))]"
+         ],
+         "properties":{
+            "displayName":"Echo API",
+            "apiRevision":"1",
+            "subscriptionRequired":true,
+            "serviceUrl":"http://echoapi.cloudapp.net/api",
+            "path":"echo",
+            "protocols":[
+               "https"
+            ],
+            "isCurrent":true
+         }
+      },
+      {
+         "type":"Microsoft.ApiManagement/service/apis",
+         "apiVersion":"2020-06-01-preview",
+         "name":"[concat(parameters('service_tdmetapodtest_name'), '/echo-api;rev=2')]",
+         "dependsOn":[
+            "[resourceId('Microsoft.ApiManagement/service', parameters('service_tdmetapodtest_name'))]"
+         ],
+         "properties":{
+            "displayName":"Echo API",
+            "apiRevision":"2",
+            "subscriptionRequired":true,
+            "serviceUrl":"http://echoapi.cloudapp.net/api",
+            "path":"echo",
+            "protocols":[
+               "https"
+            ]
+         }
+      }
+   ]
+}

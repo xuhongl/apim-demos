@@ -1,0 +1,130 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "publisherEmail": {
+      "type": "string",
+      "minLength": 1,
+       "defaultValue": "xuhliu@microsoft.com",
+      "metadata": {
+        "description": "The email address of the owner of the service"
+      }
+    },
+    "publisherName": {
+      "type": "string",
+      "minLength": 1,
+       "defaultValue": "xuhliu",
+      "metadata": {
+        "description": "The name of the owner of the service"
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "allowedValues": [
+        "Developer",
+        "Standard",
+        "Premium"
+      ],
+      "metadata": {
+        "description": "The pricing tier of this API Management service"
+      }
+    },
+    "skuCount": {
+      "type": "string",
+      "defaultValue": "1",
+      "allowedValues": [
+        "1",
+        "2",
+        "3"
+      ],
+      "metadata": {
+        "description": "The instance size of this API Management service."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    }
+  },
+  "variables": {
+    "apiManagementServiceName": "tdmetapodtest"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ApiManagement/service",
+      "apiVersion": "2019-12-01",
+      "name": "[variables('apiManagementServiceName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('sku')]",
+        "capacity": "2"
+      },
+      "properties": {
+        "publisherEmail": "[parameters('publisherEmail')]",
+        "publisherName": "[parameters('publisherName')]"
+      }
+    },
+    {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat('tdmetapodtest', '/echo-api')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', 'tdmetapodtest')]"
+            ],
+            "properties": {
+                "displayName": "Echo API",
+                "apiRevision": "3",
+                "subscriptionRequired": true,
+                "serviceUrl": "http://echoapi.cloudapp.net/api",
+                "path": "echo",
+                "protocols": [
+                    "https"
+                ],
+                "apiRevisionDescription": "test as well",
+                "isCurrent": false
+            }
+     },
+      {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat('tdmetapodtest', '/echo-api;rev=1')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', 'tdmetapodtest')]"
+            ],
+            "properties": {
+                "displayName": "Echo API",
+                "apiRevision": "1",
+                "subscriptionRequired": true,
+                "serviceUrl": "http://echoapi.cloudapp.net/api",
+                "path": "echo",
+                "protocols": [
+                    "https"
+                ],
+                "isCurrent": true
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat('tdmetapodtest', '/echo-api;rev=2')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', 'tdmetapodtest')]"
+            ],
+            "properties": {
+                "displayName": "Echo API",
+                "apiRevision": "2",
+                "subscriptionRequired": true,
+                "serviceUrl": "http://echoapi.cloudapp.net/api",
+                "path": "echo",
+                "protocols": [
+                    "https"
+                ],
+                "isCurrent": false
+            }
+        }
+  ]
+}
