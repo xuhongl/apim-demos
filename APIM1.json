@@ -1,0 +1,103 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        
+        "apimServiceName": {
+            "type": "string",
+            "defaultValue": "tdmetapodtest",
+            "metadata": {
+                "description": "APIM service name in which API has to be published"
+            }
+        },
+        "apiName": {
+            "type": "string",
+            "defaultValue": "petstore",
+            "metadata": {
+                "description": "A unique name for the API"
+            }
+        },
+        "apiVersion": {
+            "type": "string",
+            "defaultValue": "v1",
+            "metadata": {
+                "description": "Indicates the Version identifier of the API if the API is versioned"
+            }
+        },
+        "apiRevision": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "description": "Describes the Revision of the Api. If no value is provided, default revision 1 is created"
+            }
+        },
+        "displayName": {
+            "type": "string",
+            "defaultValue": "[parameters('ApiName')]",
+            "metadata": {
+                "description": "The name displayed in the developer portal. Must be 1 to 300 characters long."
+            }
+        },
+        "serviceUrl": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Absolute URL of the backend service implementing this API. Cannot be more than 2000 characters long."
+            }
+        },
+        "path": {
+            "type": "string",
+            "metadata": {
+                "description": "Relative URL uniquely identifying this API and all of its resource paths within the API Management service instance. It is appended to the API endpoint base URL specified during the service instance creation to form a public URL for this API"
+            },
+            "defaultValue": "[parameters('apiName')]"
+        },
+        "openAPISpec": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of Open API spec"
+            }
+        },
+        "apiSpecFormat": {
+            "type": "string",
+            "defaultValue": "openapi+json",
+            "allowedValues": [ "swagger-json", "swagger-link-json", "openapi", "openapi+json", "openapi-link", "openapi+json-link" ],
+            "metadata": {
+                "description": "Format of the Content in which the API is getting imported. - wadl-xml, wadl-link-json, swagger-json, swagger-link-json, wsdl, wsdl-link, openapi, openapi+json, openapi-link, openapi+json-link"
+            }
+        }
+    },
+    "variables": {
+        "apimApiVersion": "2019-01-01",
+        "subscriptionRequired": false,
+        "apiType": "http",
+        "apimApiWithRevName": "[concat(parameters('apimServiceName'), '/', parameters('apiName'),'-', parameters('apiVersion'), ';rev=', parameters('apiRevision'))]",
+        "apiWithRevName": "[concat(parameters('apiName'),'-', parameters('apiVersion'), ';rev=', parameters('apiRevision'))]",
+        "policyFormat": "xml"
+    },
+    "resources": [
+        {
+            "name": "[variables('apimApiWithRevName')]",
+            "type": "Microsoft.ApiManagement/service/apis",
+            "apiVersion": "[variables('apimApiVersion')]",
+            //"tags": "[parameters('tagDefs')]",
+            "properties": {
+                "displayName": "[parameters('displayName')]",
+                //"description": "[parameters('apiDescription')]",
+                "apiVersion": "[parameters('apiVersion')]",
+                //"apiVersionDescription": "[parameters('apiVersionDescription')]",
+                "apiRevision": "[parameters('apiRevision')]",
+                //"apiRevisionDescription": "[parameters('apiRevisionDescription')]",
+                "serviceUrl": "",
+                "path": "[parameters('path')]",
+                "protocols": "https",
+                "format": "[parameters('apiSpecFormat')]",
+                "value": "[parameters('openAPISpec')]",
+                "apiVersionSetId": "[concat(resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apimServiceName'), concat('versionset-', parameters('apiName'))))]"
+                //"subscriptionRequired": "[variables('subscriptionRequired')]",
+                //"apiType": "[variables('apiType')]"
+            }
+        }
+    ]
+}

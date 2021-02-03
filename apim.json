@@ -1,0 +1,112 @@
+{
+   "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+   "contentVersion":"1.0.0.0",
+   "parameters":{
+            "serviceUrl":{
+         "defaultValue":"",
+         "type":"String"
+   },
+      "publisherEmail":{
+         "type":"string",
+         "minLength":1,
+         "metadata":{
+            "description":"The email address of the owner of the service"
+         }
+      },
+      "publisherName":{
+         "type":"string",
+         "minLength":1,
+         "metadata":{
+            "description":"The name of the owner of the service"
+         }
+      },
+      "sku":{
+         "type":"string",
+         "allowedValues":[
+            "Developer",
+            "Standard",
+            "Premium"
+         ],
+         "defaultValue":"Developer",
+         "metadata":{
+            "description":"The pricing tier of this API Management service"
+         }
+      },
+      "skuCount":{
+         "type":"string",
+         "allowedValues":[
+            "1",
+            "2"
+         ],
+         "defaultValue":"1",
+         "metadata":{
+            "description":"The instance size of this API Management service."
+         }
+      },
+      "location":{
+         "type":"string",
+         "defaultValue":"[resourceGroup().location]",
+         "metadata":{
+            "description":"Location for all resources."
+         }
+      },
+      "service_tdmetapodtest_name":{
+         "defaultValue":"tdmetapodtest",
+         "type":"String"
+      }
+   },
+   "variables":{
+      "apiManagementServiceName":"[concat('ADOdeploy', uniqueString(resourceGroup().id))]"
+   },
+   "resources":[
+      {
+         "apiVersion":"2020-06-01-preview",
+         "name":"[parameters('service_tdmetapodtest_name')]",
+         "type":"Microsoft.ApiManagement/service",
+         "location":"Central US",
+         "tags":{
+            
+         },
+         "sku":{
+            "name":"Standard",
+            "capacity":2
+         },
+         "properties":{
+            "publisherEmail":"xuhliu@microsoft.com",
+            "publisherName":"xuhliu"
+         }
+      },
+      {
+         "type":"Microsoft.ApiManagement/service/apis",
+         "apiVersion":"2020-06-01-preview",
+         "name":"[concat(parameters('service_tdmetapodtest_name'), '/test')]",
+         "dependsOn":[
+            "[resourceId('Microsoft.ApiManagement/service', parameters('service_tdmetapodtest_name'))]"
+         ],
+         "properties":{
+            "displayName":"Test API",
+            "subscriptionRequired":true,
+            "serviceUrl":"[if(not(empty(parameters('serviceUrl'))), parameters('serviceUrl'), json('null'))]",
+            "path":"test",
+            "protocols":[
+               "https"
+            ]
+       
+         }
+      },
+
+      {
+           "type": "Microsoft.ApiManagement/service/backends",
+  "name": "backend",
+ "apiVersion":"2020-06-01-preview",
+           "dependsOn":[
+            "[resourceId('Microsoft.ApiManagement/service', parameters('service_tdmetapodtest_name'))]"
+         ],
+  "properties": {
+    "url": "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.json",
+    "protocol": "http"
+  }
+}
+
+   ]
+}
